@@ -1,0 +1,6 @@
+[submodule "dataset/clean"]
+	path = dataset/clean
+	url = https://github.com/gangaram-tii/clean-pdfs.git
+[submodule "dataset/malicious"]
+	path = dataset/malicious
+	url = https://github.com/gangaram-tii/malicious-pdfs.git
