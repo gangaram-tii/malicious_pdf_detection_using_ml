@@ -2,10 +2,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, roc_auc_score, confusion_matrix, classification_report
+from sklearn.metrics import accuracy_score, confusion_matrix
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
+from torchviz import make_dot
 
 def preprocess_data(csvFileName):
     dataframe = pd.read_csv(csvFileName)
@@ -88,22 +89,26 @@ def evaluate_model(filename, test_data, test_labels):
     model = SimpleNN(state['input_dim'])
     model.load_state_dict(state['state_dict'])
     model.eval()
+
     print(f'\nModel loaded from {filename}')
     with torch.no_grad():
         pred_labels_prob = model(test_data)
         pred_labels = (pred_labels_prob > 0.5).float()
-    
+
+    # Evaluate the model
     accuracy = accuracy_score(test_labels, pred_labels)
-    roc_auc = roc_auc_score(test_labels, pred_labels_prob)
     conf_matrix = confusion_matrix(test_labels, pred_labels)
-    class_report = classification_report(test_labels, pred_labels)
+    TN, FP, FN, TP = conf_matrix.ravel()
+    specificity = TN / (TN + FP)
+    precision = TP / (TP + FP)
+    recall = TP / (TP + FN)
     
     print(f'Accuracy: {accuracy:.4f}\n')
-    print(f'ROC AUC: {roc_auc:.4f}\n')
     print('Confusion Matrix:')
     print(conf_matrix)
-    print('\nClassification Report:')
-    print(class_report)
+
+    print('\nKey Metrics:')
+    print(f"[Precision, Recall, Specificity] \n[{precision:.4f},    {recall:.4f}, {specificity:.4f}]")
 
 # Main execution
 if __name__ == '__main__':

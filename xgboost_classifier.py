@@ -62,17 +62,18 @@ def evaluate_model(filename, test_dmatrix, test_labels):
 
     # Evaluate the model
     accuracy = accuracy_score(test_labels, pred_label)
-    roc_auc = roc_auc_score(test_labels, pred_label_prob)
     conf_matrix = confusion_matrix(test_labels, pred_label)
-    class_report = classification_report(test_labels, pred_label)
-
+    TN, FP, FN, TP = conf_matrix.ravel()
+    specificity = TN / (TN + FP)
+    precision = TP / (TP + FP)
+    recall = TP / (TP + FN)
+    
     print(f'Accuracy: {accuracy:.4f}\n')
-    print(f'ROC AUC: {roc_auc:.4f}\n')
     print('Confusion Matrix:')
     print(conf_matrix)
-    print('\nClassification Report:')
-    print(class_report)
 
+    print('\nKey Metrics:')
+    print(f"[Precision, Recall, Specificity] \n[{precision:.4f},    {recall:.4f}, {specificity:.4f}]")
 
 # Main 
 if __name__ == '__main__':

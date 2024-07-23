@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import accuracy_score, roc_auc_score, confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import pickle
@@ -45,6 +46,7 @@ def preprocess_data(csvfile):
  
  
 def train_model(training_data, training_labels, hyperparams, filename):
+    print("training started")
     knn = KNeighborsClassifier()
     # tune hyperparameters
     models = GridSearchCV(estimator=knn, param_grid=hyperparams, cv=10, scoring='accuracy', verbose=1)
@@ -60,7 +62,7 @@ def train_model(training_data, training_labels, hyperparams, filename):
 
     #print result
     print(f"Training Accuracy:   {training_accu:.2f}%")
-    print(f"Best Model(Params):  {best_model}")
+    print("training finished")
     print("\n")  
 
     fp = open(filename, 'wb') 
@@ -68,14 +70,25 @@ def train_model(training_data, training_labels, hyperparams, filename):
     fp.close()
                 
       
-def evaluate_model(test_data, test_labels, filename):
+def evaluate_model(filename, test_data, test_labels):
     # load the model from disk
     fp = open(filename, 'rb')
     model = pickle.load(fp)
-    predicted_labels = model.predict(test_data)
-    test_accu = accuracy_score(test_labels, predicted_labels)*100
-    print(f"Validation Accuracy: {test_accu:.2f}%")
+    pred_labels = model.predict(test_data)
+    # Evaluate the model
+    accuracy = accuracy_score(test_labels, pred_labels)
+    conf_matrix = confusion_matrix(test_labels, pred_labels)
+    TN, FP, FN, TP = conf_matrix.ravel()
+    specificity = TN / (TN + FP)
+    precision = TP / (TP + FP)
+    recall = TP / (TP + FN)
+    
+    print(f'Accuracy: {accuracy:.4f}\n')
+    print('Confusion Matrix:')
+    print(conf_matrix)
 
+    print('\nKey Metrics:')
+    print(f"[Precision, Recall, Specificity] \n[{precision:.4f},    {recall:.4f}, {specificity:.4f}]")
 
 # Main 
 if __name__ == '__main__':
@@ -87,5 +100,5 @@ if __name__ == '__main__':
     }
     training_data, test_data, training_labels, test_labels = preprocess_data('./dataset/features.csv')
     train_model(training_data, training_labels, hyperparams, model_path)
-    evaluate_model(model_path, test_dmatrix, test_labels)
+    evaluate_model(model_path, test_data, test_labels)
 
