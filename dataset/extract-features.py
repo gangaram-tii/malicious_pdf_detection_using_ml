@@ -1,8 +1,9 @@
 #from pdfid import PDFiD, PDFiD2JSON
 import sys
 
-#System Issue
-sys.path.insert(0, "/workspace/malware_detection/.venv/lib/python3.11/site-packages/pdfid/")
+#WA for PDFID module path
+#sys.path.insert(0, "/workspace/malware_detection/.venv/lib/python3.11/site-packages/pdfid/")
+
 from pdfid import PDFiD, PDFID2Dict
 import pandas as pd
 import os
@@ -80,7 +81,7 @@ def PDFFeaturesCSV(datasets, outputfile):
 
     # Apply the conversion function to the 'header' column
     df['header'] = df['header'].apply(convert_header_to_int)
-    df.to_csv(outputfile)
+    df.to_csv(outputfile, index_label='index')
 
 #features = process_pdf_dataset("./test")
 #features.to_csv("./features.csv", index = False)
