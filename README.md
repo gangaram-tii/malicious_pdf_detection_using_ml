@@ -26,7 +26,7 @@ To set up the project locally, follow these steps:
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/gangaram-tii/malicious_pdf_detection_using_ml.git
+   git clone --recurse-submodules -j8 https://github.com/gangaram-tii/malicious_pdf_detection_using_ml.git
    cd malicious_pdf_detection_using_ml
    ```
 2. **Create a Virtual Environment**  (Non NixOS):
