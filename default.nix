@@ -1,32 +1,19 @@
 { pkgs ? import <nixpkgs> {} }:
 
-pkgs.mkShell {
-  buildInputs = [
-    pkgs.gcc
-    pkgs.python311Full
-    pkgs.python311Packages.virtualenv
-    pkgs.python311Packages.numpy
-    pkgs.python311Packages.pandas
-    pkgs.python311Packages.matplotlib
-    pkgs.python311Packages.pytorch
-    pkgs.python311Packages.pip
-    pkgs.python311Packages.xgboost
+pkgs.python3.pkgs.buildPythonPackage rec {
+  pname = "pdfscan";
+  version = "0.0.1";
+
+  src = ./.;
+
+  propagatedBuildInputs = [
+    pkgs.python3Packages.pandas
+    pkgs.python3Packages.xgboost
   ];
 
-  shellHook = ''
-    if [ ! -d .venv ]; then
-      virtualenv .venv
-      #export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=1
-      source .venv/bin/activate
-      pip install scikit-learn
-      pip install textblob pdfid
-    else
-      source .venv/bin/activate
-      #exportSKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=1
-      pip install scikit-learn
-      pip install textblob pdfid
-    fi
-    echo "Welcome to your Python development environment."
-  '';
+  meta = with pkgs.lib; {
+    description = "A Python package to generate secure configuration for systemd service.";
+    license = licenses.mit;
+    maintainers = with maintainers; [ ];
+  };
 }
-
