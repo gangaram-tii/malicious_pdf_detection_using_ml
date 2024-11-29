@@ -10,6 +10,14 @@ import os
 __all__ = ["PDFClassifier", "main"]
 __version__ = "0.1.0"
 
+
+TRACE_ENABLED = False
+
+def trace(message):
+    if TRACE_ENABLED:
+        print(message)
+
+
 # Define host and port for the server
 HOST = '127.0.0.1'  # Localhost
 PORT = 65432        # Port to listen on
@@ -22,10 +30,10 @@ def merge_values(val1, val2):
 def merge_columns(df, column1, column2, newcolumn, drop=False):
     # Apply the function to create a new column 'merged'
     if column1 not in df:
-        print(f"Feature {column1} missing")
+        trace(f"Feature {column1} missing")
         df[column1] = 0
     if column2 not in df:
-        print(f"Feature {column2} missing")
+        trace(f"Feature {column2} missing")
         df[column2] = 0
 
     df[newcolumn] = df.apply(lambda row: merge_values(row[column1], row[column2]), axis=1)
@@ -64,14 +72,14 @@ class PDFClassifier:
                 # Wait for a connection from a client
                 conn, addr = server_socket.accept()
                 with conn:
-                    print(f"Connected by {addr}")
+                    trace(f"Connected by {addr}")
 
                     # Receive the file name from the client
                     filename = conn.recv(1024).decode('utf-8')
                     if not filename:
                         continue
 
-                    print(f"Received file name: {filename}")
+                    trace(f"Received file name: {filename}")
 
                     # Process the file and get the result
                     label = self.classify(filename)
@@ -98,7 +106,7 @@ class PDFClassifier:
                             'Decode-Media', 'Launch-EmbeddedFile', 'XFA-Colors']
         for f in selected_features:
             if f not in dataframe:
-                print(f"Feature {f} missing")
+                trace(f"Feature {f} missing")
                 dataframe[f] = 0
         features = dataframe[selected_features]
         # Create DMatrix, the data structure that XGBoost uses
