@@ -19,7 +19,7 @@ def trace(message):
 
 
 # Define host and port for the server
-HOST = '127.0.0.1'  # Localhost
+HOST = '0.0.0.0'
 PORT = 65432        # Port to listen on
 
 

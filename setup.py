@@ -4,7 +4,7 @@ setup(
     name='pdfscan',       
     version='0.0.1',
     include_package_data=True,
-    scripts=["src/pdfscan/client.sh"],
+    scripts=["src/pdfscan/scan.sh"],
     entry_points={
         'console_scripts': [
             'pdfscan=pdfscan:main',
