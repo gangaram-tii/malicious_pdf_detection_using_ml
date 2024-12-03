@@ -28,6 +28,9 @@ class PDFFeatures:
         if len(self.features):
             del self.features[0]["version"]
 
+    def count(self):
+        return len(self.features)
+
     def as_encoded_data_frame(self):
         df = self.data_frame
         # Convert columns to integers if possible
@@ -37,7 +40,10 @@ class PDFFeatures:
                 df[col] = df[col].fillna(0).astype(int)
 
         # Apply the conversion function to the 'header' column
-        df['header'] = df['header'].apply(convert_header_to_int)
+        if 'header' not in df:
+            df['header'] = 0
+        else:
+            df['header'] = df['header'].apply(convert_header_to_int)
         return df
 
     @property

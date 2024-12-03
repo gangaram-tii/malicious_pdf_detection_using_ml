@@ -28,14 +28,17 @@ def merge_values(val1, val2):
     return (val1 << 10) | val2
 
 def merge_columns(df, column1, column2, newcolumn, drop=False):
+    if column1 not in df.columns and column2 not in df.columns:
+        df[newcolumn] = 0
+        return df
+
     # Apply the function to create a new column 'merged'
-    if column1 not in df:
+    if column1 not in df.columns:
         trace(f"Feature {column1} missing")
         df[column1] = 0
-    if column2 not in df:
+    if column2 not in df.columns:
         trace(f"Feature {column2} missing")
         df[column2] = 0
-
     df[newcolumn] = df.apply(lambda row: merge_values(row[column1], row[column2]), axis=1)
     if drop:
         df = df.drop(labels=[column1, column2], axis=1)
@@ -51,13 +54,13 @@ class PDFClassifier:
     def classify(self, filename):
         if os.path.exists(filename) and os.path.getsize(filename) > 0:
             features = PDFFeatures(filename)
-            df = features.as_encoded_data_frame()
-            final_features = self.clean_and_transform(df)
-            pred_label_prob = self.booster.predict(final_features)
-            if (pred_label_prob > 0.5):
-                return "NOK"
-            else:
-                return "OK"
+            if (features.count() > 0):
+                df = features.as_encoded_data_frame()
+                final_features = self.clean_and_transform(df)
+                pred_label_prob = self.booster.predict(final_features)
+                if (pred_label_prob < 0.95):
+                    return "OK"
+            return "NOK"
         else:
             return "INV"
 
@@ -89,7 +92,8 @@ class PDFClassifier:
                     conn.sendall(response.encode('utf-8'))
     
     def clean_and_transform(self, dataframe):
-        dataframe = dataframe.drop(labels=['filename'], axis=1)
+        if 'filename' in dataframe:
+            dataframe = dataframe.drop(labels=['filename'], axis=1)
         dataframe = merge_columns(dataframe, "/OpenAction", "/AcroForm", "ActionForm", True)
         dataframe = merge_columns(dataframe, "/JBIG2Decode", "/RichMedia", "Decode-Media", True)
         dataframe = merge_columns(dataframe, "/Launch", "/EmbeddedFile", "Launch-EmbeddedFile", True)
@@ -116,7 +120,6 @@ class PDFClassifier:
 def main():
     classifier = PDFClassifier()
     classifier.start_server(PORT)
-    #print(classifier.classify("/home/gangaram/Downloads/shilpa_eid.pdf"))
 
 # Main
 if __name__ == '__main__':
