@@ -58,10 +58,14 @@ class PDFClassifier:
                 df = features.as_encoded_data_frame()
                 final_features = self.clean_and_transform(df)
                 pred_label_prob = self.booster.predict(final_features)
-                if (pred_label_prob < 0.95):
+                print(f"PDFScan: [Predict:{pred_label_prob}, Thresold:0.96]")
+                if (pred_label_prob < 0.96):
+                    print("PDFScan Result:OK")
                     return "OK"
+            print("PDFScan Result:NOTOK")
             return "NOK"
         else:
+            print("PDFScan Result:INV")
             return "INV"
 
     def start_server(self, port):
@@ -82,7 +86,7 @@ class PDFClassifier:
                     if not filename:
                         continue
 
-                    trace(f"Received file name: {filename}")
+                    print(f"Received file name: {filename}")
 
                     # Process the file and get the result
                     label = self.classify(filename)
